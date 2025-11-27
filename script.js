@@ -1,7 +1,7 @@
 // script.js
 // ==========================================
 // 請填入你的 Google Apps Script 網址
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_E8BtXVSz95pw8JRFQVuuzPWPoCeHM7w1z_qFoKwAwxHaGFuh89w4GJGpVWDv9WLm8g/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMHAYJqYOe1vBL1Gx1a4ox9-lpc1JbHyFDZGAVULD4CYo-Zrwsl-3zhV87CBAX-gUIFw/exec"; 
 // ==========================================
 
 const DB_KEY = 'drink_system_db_v2';
@@ -305,4 +305,48 @@ function deleteItem(id) {
 // 3. 新增提示視窗函式 (加在 script.js 最後面即可)
 function showModifyAlert() {
     alert('若訂錯飲料，請再訂購一次，並在備註註明"上一杯訂錯"');
+}
+
+// === 新增：清空所有訂單 ===
+function clearAllOrders() {
+    // 1. 二次確認防止誤按
+    if (!confirm("【警告】\n\n您確定要清空 Google 試算表上的「所有」訂單嗎？\n此動作無法復原！")) {
+        return;
+    }
+
+    // 2. 鎖定按鈕顯示狀態
+    // 這裡我們簡單抓取觸發事件的按鈕，如果需要更精確可以用 id
+    const btn = document.querySelector('button[onclick="clearAllOrders()"]');
+    if(btn) {
+        btn.disabled = true;
+        btn.textContent = "刪除中...";
+    }
+
+    // 3. 發送請求給 Google Apps Script
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "clear" }), // 告訴後端這是 clear 動作
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(() => {
+        alert("訂單已全部清空！");
+        
+        // 4. 重整列表
+        fetchCloudOrders(); 
+        
+        // 5. 恢復按鈕
+        if(btn) {
+            btn.disabled = false;
+            btn.textContent = "清空所有訂單";
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("清空失敗，請檢查網路連線。");
+        if(btn) {
+            btn.disabled = false;
+            btn.textContent = "清空所有訂單";
+        }
+    });
 }
