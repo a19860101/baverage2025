@@ -1,7 +1,7 @@
 // script.js
 // ==========================================
 // 請填入你的 Google Apps Script 網址
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0lPPL4__RZu0vKV-iR92r9MHpDquzfcH-Rpb_kAQo08myEVZ1ZzwdPRxgi_sbrLZw9w/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_E8BtXVSz95pw8JRFQVuuzPWPoCeHM7w1z_qFoKwAwxHaGFuh89w4GJGpVWDv9WLm8g/exec"; 
 // ==========================================
 
 const DB_KEY = 'drink_system_db_v2';
