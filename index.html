@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飲料訂購系統-測試版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-btn.active {
+            border-bottom: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-600">🥤 飲料訂購系統</span>
+                </div>
+                <div class="flex space-x-8 items-center">
+                    <button onclick="switchTab('order')" id="tab-order" class="tab-btn active h-16 px-2 focus:outline-none">客戶訂購</button>
+                    <button onclick="switchTab('admin')" disabled id="tab-admin" class="tab-btn h-16 px-2 focus:outline-none">後台管理</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-4xl mx-auto mt-8 px-4 pb-20">
+
+        <div id="view-order" class="block">
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 text-gray-700 border-b pb-2">新增訂單</h2>
+                
+                <form id="orderForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">訂購人姓名</label>
+                        <input type="text" id="customerName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50 border p-2" placeholder="請輸入姓名">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">選擇飲料店</label>
+                        <select id="shopSelect" onchange="updateMenuOptions()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white border p-2">
+                            <option value="">-- 請選擇店家 --</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">品項</label>
+                            <select id="itemSelect" required onchange="updateSizeDisplay()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white border p-2">
+                                <option value="">-- 請先選擇店家 --</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">大小 / 價格</label>
+                            <input type="text" id="sizeDisplay" readonly class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 text-gray-500 p-2 cursor-not-allowed" placeholder="自動帶入">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">甜度</label>
+                            <select id="sugarSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white border p-2">
+                                <option value="正常甜">正常甜</option>
+                                <option value="少糖">少糖 (7分)</option>
+                                <option value="半糖">半糖 (5分)</option>
+                                <option value="微糖">微糖 (3分)</option>
+                                <option value="二分糖">二分糖 (2分)</option>
+                                <option value="一分糖">一分糖 (1分)</option>
+                                <option value="無糖">無糖</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">冰量</label>
+                            <select id="iceSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white border p-2">
+                                <option value="正常冰">正常冰</option>
+                                <option value="少冰">少冰</option>
+                                <option value="微冰">微冰</option>
+                                <option value="去冰">去冰</option>
+                                <option value="常溫">常溫</option>
+                                <option value="溫">溫</option>
+                                <option value="熱">熱</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">備註 (選填)</label>
+                        <input type="text" id="noteInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50 border p-2" placeholder="例：不要封膜、多加珍珠...">
+                    </div>
+
+                    <button type="button" onclick="submitOrder()" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition font-bold text-lg">
+                        送出訂單
+                    </button>
+                </form>
+
+                <div class="mt-10">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">最新訂單列表</h3>
+                    <div class="overflow-x-auto border rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">姓名</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">店家</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">品項</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">甜度</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">冰量</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">價格</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">備註</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderListBody" class="bg-white divide-y divide-gray-200">
+                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500 text-sm">讀取中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-admin" class="hidden">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-yellow-800">資料庫管理</p>
+                        <p class="text-sm text-yellow-700">若您修改了 <code>data.js</code>，請點擊右側按鈕更新。</p>
+                    </div>
+                    <button onclick="resetDataFromFile()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded shadow transition">
+                        從檔案重置資料庫
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
+                    <h3 class="text-lg font-bold mb-4 text-gray-700">1. 新增店家</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="newShopName" placeholder="輸入店家名稱" class="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <button onclick="addShop()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">新增店家</button>
+                    </div>
+                    <div class="mt-6">
+                        <h4 class="text-sm font-semibold text-gray-500 mb-2">目前店家列表：</h4>
+                        <ul id="shopListDisplay" class="text-sm text-gray-700 list-disc list-inside space-y-1 bg-gray-50 p-3 rounded h-40 overflow-y-auto">
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-bold mb-4 text-gray-700">2. 新增菜單品項</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
+                        <div class="md:col-span-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">歸屬店家</label>
+                            <select id="adminShopSelect" class="w-full border border-gray-300 rounded p-2 bg-white"></select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">品項名稱</label>
+                            <input type="text" id="newItemName" placeholder="例: 珍珠奶茶" class="w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">大小</label>
+                            <select id="newItemSize" class="w-full border border-gray-300 rounded p-2 bg-white">
+                                <option value="M">中杯 (M)</option>
+                                <option value="L">大杯 (L)</option>
+                                <option value="XL">瓶裝/特大</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">價格</label>
+                            <input type="number" id="newItemPrice" placeholder="$" class="w-full border border-gray-300 rounded p-2">
+                        </div>
+                    </div>
+                    <button onclick="addMenuItem()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mb-6">新增品項至資料庫</button>
+
+                    <div class="border-t pt-4">
+                        <h4 class="text-sm font-semibold text-gray-500 mb-3">現有菜單資料庫</h4>
+                        <div class="overflow-y-auto max-h-60 border rounded">
+                            <table class="min-w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-2">店家</th>
+                                        <th class="px-4 py-2">品項</th>
+                                        <th class="px-4 py-2">大小</th>
+                                        <th class="px-4 py-2">價格</th>
+                                        <th class="px-4 py-2">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menuDatabaseBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
